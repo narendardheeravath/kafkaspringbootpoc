@@ -1,0 +1,53 @@
+spring:
+  application:
+    name: kafka-spring-boot-poc
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 3
+      properties:
+        enable.idempotence: true
+    consumer:
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      enable-auto-commit: true
+
+# ── Server ─────────────────────────────────────────────────────────────────────
+server:
+  port: 8096
+  error:
+    include-message: always
+
+# ── Topic names ────────────────────────────────────────────────────────────────
+app:
+  kafka:
+    topics:
+      orders: topic-orders           # Scenario 1: Single subscriber
+      notifications: topic-notifications  # Scenario 2: Multiple subscribers (broadcast)
+      inventory: topic-inventory     # Scenario 3: Multiple groups (CQRS)
+      audit: topic-audit             # Scenario 4: Competing consumers (same group)
+      payment: topic-payment         # Scenario 5: Batch consumer
+
+# ── Swagger / SpringDoc ────────────────────────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    tags-sorter: alpha
+    operations-sorter: alpha
+
+# ── Logging ────────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.kafkapoc: DEBUG
+    org.springframework.kafka: WARN
+    org.apache.kafka: WARN
+  pattern:
+    console: "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
